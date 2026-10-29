@@ -24,7 +24,7 @@ h1{font-size:17px;margin:4px 0 8px}
 .c input{width:100%;box-sizing:border-box;border:1px solid var(--bd);background:var(--yel);color:var(--tx);border-radius:4px;padding:3px}
 .w{overflow-x:auto;border:1px solid var(--bd);border-radius:8px;background:var(--card)}
 table{border-collapse:collapse}
-#t{min-width:2300px}
+#t{min-width:2350px}
 th{color:#fff;font-size:11px;padding:6px 4px;border:1px solid var(--bd);position:sticky;top:0}
 td{border:1px solid var(--bd);padding:0}
 td input,td select{width:100%;box-sizing:border-box;border:0;background:transparent;color:var(--tx);padding:7px 5px;font-size:13px;min-width:90px}
@@ -49,10 +49,10 @@ button.x{background:transparent;color:var(--red);padding:4px 8px;margin:0}
 <div class="c"><b>Bénéfice du mois</b><span id="ben">0 Ar</span></div>
 </div>
 <div class="w"><table id="t"><thead><tr>
-<th class="h1">Date</th><th class="h1">Opération / Description</th><th class="hr">Ajout capital</th><th class="hg">Retrait capital</th>
+<th class="h1"></th><th class="h1">Date</th><th class="h1">Opération / Description</th><th class="hr">Ajout capital</th><th class="hg">Retrait capital</th>
 <th class="hr">Poids achat (g)</th><th class="hr">Prix achat/g</th><th class="hr">Montant achat</th><th class="h1">Nature de dépense</th><th class="hr">Prix de dépense</th>
 <th class="hg">Poids revente (g)</th><th class="hg">Prix revente/g</th><th class="hg">Montant revente</th><th class="h1">État de paiement</th><th class="h1">Paiement partiel reçu</th>
-<th class="hg">Paiement reçu</th><th class="h1">Reste à payer</th><th class="hr">Perte fonte (g)</th><th class="h1">Stock net (g)</th><th class="hy">Bénéfice / Perte</th><th class="h1">Capital disponible</th><th class="h1">Remarque</th><th class="h1"></th>
+<th class="hg">Paiement reçu</th><th class="h1">Reste à payer</th><th class="hr">Perte fonte (g)</th><th class="h1">Stock net (g)</th><th class="hy">Bénéfice / Perte</th><th class="h1">Capital disponible</th><th class="h1">Remarque</th>
 </tr></thead><tbody id="b"></tbody></table></div>
 <button onclick="add()">+ Ajouter une ligne</button>
 </div>
@@ -64,9 +64,9 @@ button.x{background:transparent;color:var(--red);padding:4px 8px;margin:0}
 <div class="c"><b>Valeur stock initial (Ar)</b><input id="val0" type="text" inputmode="decimal"></div>
 <div class="c"><b>Tolérance perte fonte (g)</b><input id="tol" type="number" step="0.01" inputmode="decimal"></div>
 </div>
-<button onclick="bk()">💾 Sauvegarder</button><button onclick="rs()">♻️ Restaurer</button>
-<textarea id="bx" style="display:none;width:100%;box-sizing:border-box;height:90px;margin-top:8px;background:var(--card);color:var(--tx);border:1px solid var(--bd);border-radius:6px;font-size:12px"></textarea>
-<p class="n">Tahiry ao anaty navigateur-nao ity angona ity. Ny capital sy stock dia mifindra ho azy amin'ny volana manaraka. Ny "Payé" dia manidy ny Paiement partiel ary 0 Ar ny Reste à payer. Ny very ≤ tolérance rehefa mivarotra dia tsy tafiditra ao amin'ny stock.</p>
+<button onclick="bk()">💾 Sauvegarder</button><button onclick="rs()">♻️ Restaurer</button><button onclick="mg()">🔀 Fusionner</button>
+<textarea id="bx" hidden style="display:none;width:100%;box-sizing:border-box;height:90px;margin-top:8px;background:var(--card);color:var(--tx);border:1px solid var(--bd);border-radius:6px;font-size:12px"></textarea>
+<p class="n">Tahiry ao anaty navigateur-nao ity angona ity. Sauvegarder = mamorona fichier; Restaurer = mamerina (misolo); Fusionner = manampy ny vaovao. Ny capital sy stock dia mifindra ho azy amin'ny volana manaraka. Ny "Payé" dia manidy ny Paiement partiel ary 0 Ar ny Reste à payer. Ny very ≤ tolérance rehefa mivarotra dia tsy tafiditra ao amin'ny stock.</p>
 <script>
 var OPS=["","Achat/location Terrain","Achat Or","Autre(s)","Autre(s) Achat(s)","Commission","Livraison","Paiement","Retouche capital","Vente"];
 var ET=["","Payé","Partiel","Non payé"];
@@ -110,7 +110,7 @@ function all(){var res=[];KEYS.forEach(function(k,i){var op=i?res[i-1].close:{ca
 function build(){
   var R=rowsOf(S.cur),y=+S.cur.slice(0,4),m=+S.cur.slice(5),last=new Date(y,m,0).getDate(),h="";
   R.forEach(function(r,i){
-    h+="<tr>";
+    h+='<tr><td style="white-space:nowrap;padding:2px 4px"><button class="x" style="color:var(--hd);font-size:18px" onclick="ins('+i+')">＋</button><button class="x" onclick="del('+i+')">✕</button></td>';
     K.forEach(function(k,c){
       if(k===""||(c>=14&&c<=19)){h+='<td class="k" id="c'+i+'_'+c+'"></td>';return}
       var v=r[k]==null?"":r[k];
@@ -120,7 +120,7 @@ function build(){
       else if(M[k])h+='<td><input type="text" class="m" inputmode="decimal" data-i="'+i+'" data-k="'+k+'" value="'+fm(v)+'"'+(k=="pp"&&r.et=="Payé"?" disabled":"")+'></td>';
       else h+='<td><input type="number" step="any" inputmode="decimal" data-i="'+i+'" data-k="'+k+'" value="'+v+'"></td>';
     });
-    h+='<td><button class="x" onclick="del('+i+')">✕</button></td></tr>';
+    h+='</tr>';
   });
   $("b").innerHTML=h;
   $("b").querySelectorAll("input,select").forEach(function(e){
@@ -161,14 +161,27 @@ function view(v){S.view=v;$("vm").style.display=v=="m"?"":"none";$("vb").style.d
   if(v=="m")build();else calc();save()}
 function add(){rowsOf(S.cur).push({});build();save()}
 function del(i){if(confirm("Fafana ity andalana ity?")){var R=rowsOf(S.cur);R.splice(i,1);if(!R.length)R.push({});build();save()}}
-function bk(){var x=$("bx"),t=JSON.stringify(S);x.style.display="block";x.value=t;x.dataset.r="";
-  if(navigator.share){navigator.share({title:"Sauvegarde Gestion Or",text:t}).catch(function(){})}
-  else if(navigator.clipboard){navigator.clipboard.writeText(t).then(function(){alert("Voakopia ny sauvegarde. Apetaho any amin'ny WhatsApp/Notes.")}).catch(function(){x.select()})}
-  else x.select()}
-function rs(){var x=$("bx");x.style.display="block";
-  if(!x.dataset.r){x.value="";x.placeholder="Apetaho eto ny sauvegarde, dia tsindrio indray ny Restaurer";x.dataset.r="1";return}
-  try{var o=JSON.parse(x.value);if(!o||(!o.rows&&!o.months))throw 0;S=o;fix();save();init();x.value="";x.style.display="none";x.dataset.r="";alert("Voaverina ny angona.")}
-  catch(e){alert("Tsy mety ny sauvegarde apetraka.")}}
+function dl(){var t=JSON.stringify(S),d=new Date(),n="gestion-or-"+d.toISOString().slice(0,10)+".json";
+  var bl=new Blob([t],{type:"application/json"}),a=document.createElement("a");
+  a.href=URL.createObjectURL(bl);a.download=n;document.body.appendChild(a);a.click();
+  setTimeout(function(){URL.revokeObjectURL(a.href);a.remove()},1500);
+  alert("Voatahiry ny fichier "+n+" ao amin'ny Téléchargements. Azonao alefa any amin'ny WhatsApp.")}
+function bk(){dl()}
+function pick(cb){var i=document.createElement("input");i.type="file";i.accept=".json,application/json,text/plain";
+  i.onchange=function(){var f=i.files&&i.files[0];if(!f)return;var r=new FileReader();r.onload=function(){cb(String(r.result))};r.readAsText(f)};i.click()}
+function parse(t){var o=JSON.parse(t);if(!o||(!o.rows&&!o.months))throw 0;return o}
+function rs(){pick(function(t){try{var o=parse(t);
+  if(!confirm("Hosoloana ny angona rehetra ao amin'ity application ity. Tohizana?"))return;
+  S=o;fix();save();init();alert("Voaverina ny angona.")}catch(e){alert("Tsy mety ity fichier ity.")}})}
+function nonEmpty(r){return Object.keys(r).some(function(c){return r[c]!==""&&r[c]!=null})}
+function mg(){pick(function(t){try{var o=parse(t),inc=o.months||{},added=0;
+  if(o.rows){inc={};inc[KEYS[0]]={rows:o.rows}}
+  Object.keys(inc).forEach(function(k){
+    var cur=rowsOf(k),seen={};cur.forEach(function(r){seen[JSON.stringify(r)]=1});
+    (inc[k].rows||[]).forEach(function(r){if(nonEmpty(r)&&!seen[JSON.stringify(r)]){cur.push(r);seen[JSON.stringify(r)]=1;added++}});
+    var kept=cur.filter(nonEmpty);S.months[k].rows=kept.length?kept:[{}]});
+  save();init();alert("Voafusionné: andalana "+added+" vaovao nampiana.")}catch(e){alert("Tsy mety ity fichier ity.")}})}
+function ins(i){rowsOf(S.cur).splice(i+1,0,{});build();save()}
 function init(){
   $("cap").value=fm(S.cap);$("st0").value=S.st0;$("val0").value=fm(S.val0);$("tol").value=S.tol;
   $("mo").value=S.cur;view(S.view)}
