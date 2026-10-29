@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="fr"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Gestion Or</title>
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#4f7396">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<style>
+:root{--bg:#f6f3ea;--card:#fff;--tx:#222;--mu:#666;--bd:#d6d0bd;--hd:#4f7396;--red:#c0504d;--grn:#6aa84f;--yel:#f6e7a8;--off:#e3e3e3;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#1b1a17;--card:#262521;--tx:#eee;--mu:#aaa;--bd:#4a473e;--yel:#6b5d1f;--off:#3a3a3a}}
+:root[data-theme="dark"]{--bg:#1b1a17;--card:#262521;--tx:#eee;--mu:#aaa;--bd:#4a473e;--yel:#6b5d1f;--off:#3a3a3a}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--tx);font:14px/1.4 system-ui,Arial,sans-serif;padding:10px}
+h1{font-size:17px;margin:4px 0 8px}
+.bar{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-bottom:8px}
+.bar select{font-size:15px;padding:8px;border-radius:6px;border:1px solid var(--bd);background:var(--card);color:var(--tx);flex:1;min-width:160px}
+.tab{background:var(--card);color:var(--tx);border:1px solid var(--bd);margin:0}
+.tab.on{background:var(--hd);color:#fff;border-color:var(--hd)}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;margin-bottom:10px}
+.c{background:var(--card);border:1px solid var(--bd);border-radius:8px;padding:8px}
+.c b{display:block;font-size:11px;color:var(--mu);font-weight:600}
+.c span,.c input{font-size:16px;font-weight:700}
+.c input{width:100%;box-sizing:border-box;border:1px solid var(--bd);background:var(--yel);color:var(--tx);border-radius:4px;padding:3px}
+.w{overflow-x:auto;border:1px solid var(--bd);border-radius:8px;background:var(--card)}
+table{border-collapse:collapse}
+#t{min-width:2300px}
+th{color:#fff;font-size:11px;padding:6px 4px;border:1px solid var(--bd);position:sticky;top:0}
+td{border:1px solid var(--bd);padding:0}
+td input,td select{width:100%;box-sizing:border-box;border:0;background:transparent;color:var(--tx);padding:7px 5px;font-size:13px;min-width:90px}
+td input:disabled{background:var(--off)}
+td.k{padding:7px 6px;text-align:right;white-space:nowrap}
+.h1{background:var(--hd)}.hr{background:var(--red)}.hg{background:var(--grn)}.hy{background:var(--yel);color:var(--tx)}
+button{background:var(--hd);color:#fff;border:0;border-radius:6px;padding:9px 14px;font-size:14px;margin:8px 6px 0 0}
+button.x{background:transparent;color:var(--red);padding:4px 8px;margin:0}
+.n{color:var(--mu);font-size:12px;margin-top:8px}
+.neg{color:var(--red)}
+#vb td{padding:7px 8px;text-align:right;white-space:nowrap}#vb td:first-child{text-align:left}
+#vb tr.tot td{font-weight:700;background:var(--yel)}
+</style></head><body>
+<h1>🪙 Gestion achats/reventes d'or en poudre</h1>
+<div class="bar"><select id="mo"></select><button class="tab" id="tm" onclick="view('m')">Mois</button><button class="tab" id="tb" onclick="view('b')">Bilan</button></div>
+<div id="vm">
+<div class="cards">
+<div class="c"><b>Capital début de mois</b><span id="cd">0 Ar</span></div>
+<div class="c"><b>Capital fin de mois</b><span id="capd">0 Ar</span></div>
+<div class="c"><b>Dépenses du mois</b><span id="dep">0 Ar</span></div>
+<div class="c"><b>Stock fin de mois</b><span id="stk">0 g</span></div>
+<div class="c"><b>Bénéfice du mois</b><span id="ben">0 Ar</span></div>
+</div>
+<div class="w"><table id="t"><thead><tr>
+<th class="h1">Date</th><th class="h1">Opération / Description</th><th class="hr">Ajout capital</th><th class="hg">Retrait capital</th>
+<th class="hr">Poids achat (g)</th><th class="hr">Prix achat/g</th><th class="hr">Montant achat</th><th class="h1">Nature de dépense</th><th class="hr">Prix de dépense</th>
+<th class="hg">Poids revente (g)</th><th class="hg">Prix revente/g</th><th class="hg">Montant revente</th><th class="h1">État de paiement</th><th class="h1">Paiement partiel reçu</th>
+<th class="hg">Paiement reçu</th><th class="h1">Reste à payer</th><th class="hr">Perte fonte (g)</th><th class="h1">Stock net (g)</th><th class="hy">Bénéfice / Perte</th><th class="h1">Capital disponible</th><th class="h1">Remarque</th><th class="h1"></th>
+</tr></thead><tbody id="b"></tbody></table></div>
+<button onclick="add()">+ Ajouter une ligne</button>
+</div>
+<div id="vb" style="display:none"><div class="w"><table id="bt"></table></div></div>
+<h1 style="font-size:14px;margin-top:14px">Paramètres de départ (volana voalohany: Septembre 2026)</h1>
+<div class="cards">
+<div class="c"><b>Capital initial (Ar)</b><input id="cap" type="text" inputmode="decimal"></div>
+<div class="c"><b>Stock initial (g)</b><input id="st0" type="number" step="0.01" inputmode="decimal"></div>
+<div class="c"><b>Valeur stock initial (Ar)</b><input id="val0" type="text" inputmode="decimal"></div>
+<div class="c"><b>Tolérance perte fonte (g)</b><input id="tol" type="number" step="0.01" inputmode="decimal"></div>
+</div>
+<button onclick="bk()">💾 Sauvegarder</button><button onclick="rs()">♻️ Restaurer</button>
+<textarea id="bx" style="display:none;width:100%;box-sizing:border-box;height:90px;margin-top:8px;background:var(--card);color:var(--tx);border:1px solid var(--bd);border-radius:6px;font-size:12px"></textarea>
+<p class="n">Tahiry ao anaty navigateur-nao ity angona ity. Ny capital sy stock dia mifindra ho azy amin'ny volana manaraka. Ny "Payé" dia manidy ny Paiement partiel ary 0 Ar ny Reste à payer. Ny very ≤ tolérance rehefa mivarotra dia tsy tafiditra ao amin'ny stock.</p>
+<script>
+var OPS=["","Achat/location Terrain","Achat Or","Autre(s)","Autre(s) Achat(s)","Commission","Livraison","Paiement","Retouche capital","Vente"];
+var ET=["","Payé","Partiel","Non payé"];
+var MN=["Janvier","Février","Mars","Avril","Mai","Juin","Juillet","Août","Septembre","Octobre","Novembre","Décembre"];
+var KEYS=[],LB=[];
+for(var i=0;i<60;i++){var yy=2026+Math.floor((8+i)/12),mm=(8+i)%12;KEYS.push(yy+"-"+(mm<9?"0":"")+(mm+1));LB.push(MN[mm]+" "+yy)}
+var S={cap:10000000,tol:0.1,st0:0,val0:0,months:{},cur:KEYS[0],view:"m"};
+try{var s0=localStorage.getItem("gor");if(s0)S=JSON.parse(s0)}catch(e){}
+function fix(){if(S.rows){S.months={};S.months[KEYS[0]]={rows:S.rows};delete S.rows}
+  S.months=S.months||{};if(S.st0==null)S.st0=0;if(S.val0==null)S.val0=0;if(S.tol==null)S.tol=0.1;if(S.cap==null)S.cap=0;
+  if(KEYS.indexOf(S.cur)<0)S.cur=KEYS[0];S.view=S.view||"m"}
+fix();
+var $=function(i){return document.getElementById(i)};
+var num=function(v){var x=parseFloat(String(v==null?"":v).replace(/[^0-9.,\-]/g,"").replace(",","."));return isNaN(x)?0:x};
+var sp=function(n){return String(n).replace(/\B(?=(\d{3})+(?!\d))/g,"\u00a0")};
+var M={aj:1,re:1,pra:1,pd:1,prr:1,pp:1};
+var raw=function(v){return String(v).replace(/[^0-9.,]/g,"").replace(",",".")};
+var f=function(x){return (x<0?"-":"")+sp(Math.round(Math.abs(x)))+"\u00a0Ar"};
+var g=function(x){var v=Math.round(Math.abs(x)*10000)/10000,p=String(v).split(".");return (x<0?"-":"")+sp(p[0])+(p[1]?","+p[1]:"")+"\u00a0g"};
+var fm=function(v){return v===""||v==null?"":f(num(v))};
+var K=["d","op","aj","re","pa","pra","","nd","pd","pr","prr","","et","pp","","","","","","","rm"];
+function rowsOf(k){if(!S.months[k])S.months[k]={rows:[{},{}]};return S.months[k].rows}
+function save(){try{localStorage.setItem("gor",JSON.stringify(S))}catch(e){}}
+function calcMonth(rows,open){
+  var tol=num(S.tol),cE=num(open.st),cG=num(open.val),cJ=0,cU=0,cC=0,cD=0,cI=0,cO=0,cGr=0,ach=0,ven=0,ben=0,out=[],e0=num(open.st);
+  rows.forEach(function(r){
+    var E=num(r.pa),G=E*num(r.pra),J=num(r.pr),Lm=J*num(r.prr);
+    cE+=E;cG+=G;cGr+=G;cJ+=J;cC+=num(r.aj);cD+=num(r.re);cI+=num(r.pd);ach+=G;ven+=Lm;
+    var U=0,rw=Math.round((cE-cJ-cU)*10000)/10000;
+    if(J>0&&rw>0&&rw<=tol)U=rw;cU+=U;
+    var O=Lm>0?(r.et=="Payé"?Lm:(r.et=="Partiel"?num(r.pp):0)):0;cO+=O;
+    var avg=cE?cG/cE:0,B=Lm>0?Lm-(J+U)*avg:null;if(B!=null)ben+=B;
+    var empty=!Object.keys(r).some(function(k){return r[k]!==""&&r[k]!=null});
+    out.push({E:E,pra:num(r.pra),G:G,Lm:Lm,O:O,J:J,U:U,B:B,stock:Math.round((cE-cJ-cU)*10000)/10000,cap:num(open.cap)+cC-cD-cGr-cI+cO,empty:empty,pay:r.et=="Payé"});
+  });
+  var st=Math.round((cE-cJ-cU)*10000)/10000;
+  return {rows:out,open:open,close:{cap:num(open.cap)+cC-cD-cGr-cI+cO,st:st,val:cE?st*cG/cE:0},t:{ach:ach,ven:ven,dep:cI,ben:ben}};
+}
+function all(){var res=[];KEYS.forEach(function(k,i){var op=i?res[i-1].close:{cap:num(S.cap),st:num(S.st0),val:num(S.val0)};
+  res.push(calcMonth(S.months[k]?S.months[k].rows:[],op))});return res}
+function build(){
+  var R=rowsOf(S.cur),y=+S.cur.slice(0,4),m=+S.cur.slice(5),last=new Date(y,m,0).getDate(),h="";
+  R.forEach(function(r,i){
+    h+="<tr>";
+    K.forEach(function(k,c){
+      if(k===""||(c>=14&&c<=19)){h+='<td class="k" id="c'+i+'_'+c+'"></td>';return}
+      var v=r[k]==null?"":r[k];
+      if(k=="op"||k=="et"){var L=k=="op"?OPS:ET;h+='<td><select data-i="'+i+'" data-k="'+k+'">'+L.map(function(o){return '<option'+(o==v?" selected":"")+'>'+o+'</option>'}).join("")+'</select></td>'}
+      else if(k=="d")h+='<td><input type="date" min="'+S.cur+'-01" max="'+S.cur+'-'+(last<10?"0":"")+last+'" data-i="'+i+'" data-k="d" value="'+v+'"></td>';
+      else if(k=="nd"||k=="rm")h+='<td><input type="text" data-i="'+i+'" data-k="'+k+'" value="'+String(v).replace(/"/g,"&quot;")+'"></td>';
+      else if(M[k])h+='<td><input type="text" class="m" inputmode="decimal" data-i="'+i+'" data-k="'+k+'" value="'+fm(v)+'"'+(k=="pp"&&r.et=="Payé"?" disabled":"")+'></td>';
+      else h+='<td><input type="number" step="any" inputmode="decimal" data-i="'+i+'" data-k="'+k+'" value="'+v+'"></td>';
+    });
+    h+='<td><button class="x" onclick="del('+i+')">✕</button></td></tr>';
+  });
+  $("b").innerHTML=h;
+  $("b").querySelectorAll("input,select").forEach(function(e){
+    var i=+e.dataset.i,k=e.dataset.k;
+    e.addEventListener("input",function(){
+      R[i][k]=M[k]?raw(e.value):e.value;
+      if(k=="et"){if(e.value=="Payé")R[i].pp="";build()}
+      calc();save()});
+    if(e.classList.contains("m")){
+      e.addEventListener("focus",function(){var v=R[i][k];e.value=v==null?"":v});
+      e.addEventListener("blur",function(){e.value=fm(R[i][k])})}
+  });
+  calc();
+}
+function calc(){
+  var res=all(),ix=KEYS.indexOf(S.cur),mo=res[ix],R=rowsOf(S.cur);
+  mo.rows.forEach(function(o,i){
+    var r=R[i],set=function(c,t,neg){var el=$("c"+i+"_"+c);if(el){el.textContent=t;el.className="k"+(neg?" neg":"")}};
+    set(6,o.E&&o.pra?f(o.G):"");set(11,o.Lm>0?f(o.Lm):"");
+    set(14,o.Lm>0?f(o.O):"");set(15,o.Lm>0?f(o.pay?0:o.Lm-o.O):"");
+    set(16,o.J>0&&o.U>0?g(o.U):"");set(17,o.empty?"":g(o.stock));
+    set(18,o.B!=null?f(o.B):"",o.B!=null&&o.B<0);set(19,o.empty?"":f(o.cap));
+  });
+  $("cd").textContent=f(mo.open.cap);$("capd").textContent=f(mo.close.cap);$("dep").textContent=f(mo.t.dep);
+  $("stk").textContent=g(mo.close.st);$("ben").textContent=f(mo.t.ben);
+  if(S.view=="b")bilan(res);
+}
+function bilan(res){
+  var n=11;KEYS.forEach(function(k,i){if(S.months[k]&&S.months[k].rows.some(function(r){return Object.keys(r).some(function(x){return r[x]!==""&&r[x]!=null})}))n=Math.max(n,i)});
+  var h="<tr>"+["Mois","Achats","Ventes","Dépenses","Bénéfice","Capital fin","Stock fin"].map(function(t){return '<th class="h1">'+t+'</th>'}).join("")+"</tr>",T={a:0,v:0,d:0,b:0};
+  for(var i=0;i<=n;i++){var m=res[i];T.a+=m.t.ach;T.v+=m.t.ven;T.d+=m.t.dep;T.b+=m.t.ben;
+    h+="<tr><td>"+LB[i]+"</td><td>"+f(m.t.ach)+"</td><td>"+f(m.t.ven)+"</td><td>"+f(m.t.dep)+"</td><td>"+f(m.t.ben)+"</td><td>"+f(m.close.cap)+"</td><td>"+g(m.close.st)+"</td></tr>"}
+  h+='<tr class="tot"><td>TOTAL</td><td>'+f(T.a)+"</td><td>"+f(T.v)+"</td><td>"+f(T.d)+"</td><td>"+f(T.b)+"</td><td></td><td></td></tr>";
+  $("bt").innerHTML=h;
+}
+function view(v){S.view=v;$("vm").style.display=v=="m"?"":"none";$("vb").style.display=v=="b"?"":"none";
+  $("tm").className="tab"+(v=="m"?" on":"");$("tb").className="tab"+(v=="b"?" on":"");$("mo").style.display=v=="m"?"":"none";
+  if(v=="m")build();else calc();save()}
+function add(){rowsOf(S.cur).push({});build();save()}
+function del(i){if(confirm("Fafana ity andalana ity?")){var R=rowsOf(S.cur);R.splice(i,1);if(!R.length)R.push({});build();save()}}
+function bk(){var x=$("bx"),t=JSON.stringify(S);x.style.display="block";x.value=t;x.dataset.r="";
+  if(navigator.share){navigator.share({title:"Sauvegarde Gestion Or",text:t}).catch(function(){})}
+  else if(navigator.clipboard){navigator.clipboard.writeText(t).then(function(){alert("Voakopia ny sauvegarde. Apetaho any amin'ny WhatsApp/Notes.")}).catch(function(){x.select()})}
+  else x.select()}
+function rs(){var x=$("bx");x.style.display="block";
+  if(!x.dataset.r){x.value="";x.placeholder="Apetaho eto ny sauvegarde, dia tsindrio indray ny Restaurer";x.dataset.r="1";return}
+  try{var o=JSON.parse(x.value);if(!o||(!o.rows&&!o.months))throw 0;S=o;fix();save();init();x.value="";x.style.display="none";x.dataset.r="";alert("Voaverina ny angona.")}
+  catch(e){alert("Tsy mety ny sauvegarde apetraka.")}}
+function init(){
+  $("cap").value=fm(S.cap);$("st0").value=S.st0;$("val0").value=fm(S.val0);$("tol").value=S.tol;
+  $("mo").value=S.cur;view(S.view)}
+$("mo").innerHTML=KEYS.map(function(k,i){return '<option value="'+k+'">'+LB[i]+'</option>'}).join("");
+$("mo").onchange=function(){S.cur=this.value;build();save()};
+$("cap").oninput=function(){S.cap=raw(this.value);calc();save()};
+$("cap").onfocus=function(){this.value=S.cap};$("cap").onblur=function(){this.value=fm(S.cap)};
+$("val0").oninput=function(){S.val0=raw(this.value);calc();save()};
+$("val0").onfocus=function(){this.value=S.val0};$("val0").onblur=function(){this.value=fm(S.val0)};
+$("st0").oninput=function(){S.st0=this.value;calc();save()};
+$("tol").oninput=function(){S.tol=this.value;calc();save()};
+init();
+if("serviceWorker" in navigator){window.addEventListener("load",function(){navigator.serviceWorker.register("sw.js").catch(function(){})})}
+</script></body></html>

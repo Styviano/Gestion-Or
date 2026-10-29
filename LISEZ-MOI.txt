@@ -1,0 +1,18 @@
+GESTION OR - APPLICATION (PWA)
+
+Fichiers (tsy omen'ny ZIP ho voaova): index.html, manifest.webmanifest, sw.js, icon-192.png, icon-512.png
+
+FAMETRAHANA MAIMAIM-POANA (GitHub Pages)
+1. Mamoròna kaonty maimaim-poana amin'ny github.com
+2. "New repository" > anarana: gestion-or > Public > Create repository
+3. "uploading an existing file": ampidiro ireo fichier 5 (aorian'ny Extraire ny ZIP) > Commit changes
+4. Settings > Pages > Branch: main / (root) > Save
+5. Miandrasa 1-2 minitra. Hiseho ny rohy: https://ANARANAO.github.io/gestion-or/
+
+FAMPIASANA AO AMIN'NY FINDAY
+1. Sokafy ilay rohy amin'ny Chrome (misy internet, in-iray)
+2. Tsindrio ny ⋮ > Installer l'application (na Ajouter à l'écran d'accueil)
+3. Efa afaka mampiasa tsy misy internet. Ny angona dia voatahiry ao amin'ny finday.
+4. Manaova Sauvegarder isan'andro (alefaso any amin'ny WhatsApp).
+
+HAVAOZINA: raha ovaina ny index.html, ovay ny "gor-v1" ao amin'ny sw.js ho "gor-v2".
