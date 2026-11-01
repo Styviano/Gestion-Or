@@ -46,7 +46,7 @@ button.x{background:transparent;color:var(--red);padding:4px 8px;margin:0}
 <div class="c"><b>Capital fin de mois</b><span id="capd">0 Ar</span></div>
 <div class="c"><b>Dépenses du mois</b><span id="dep">0 Ar</span></div>
 <div class="c"><b>Stock fin de mois</b><span id="stk">0 g</span></div>
-<div class="c"><b>Bénéfice du mois</b><span id="ben">0 Ar</span></div>
+<div class="c"><b>Bénéfice net du mois (dépenses déduites)</b><span id="ben">0 Ar</span></div>
 </div>
 <div class="w"><table id="t"><thead><tr>
 <th class="h1"></th><th class="h1">Date</th><th class="h1">Opération / Description</th><th class="hr">Ajout capital</th><th class="hg">Retrait capital</th>
@@ -98,7 +98,7 @@ function calcMonth(rows,open){
     var U=0,rw=Math.round((cE-cJ-cU)*10000)/10000;
     if(J>0&&rw>0&&rw<=tol)U=rw;cU+=U;
     var O=Lm>0?(r.et=="Payé"?Lm:(r.et=="Partiel"?num(r.pp):0)):0;cO+=O;
-    var avg=cE?cG/cE:0,B=Lm>0?Lm-(J+U)*avg:null;if(B!=null)ben+=B;
+    var avg=cE?cG/cE:0,B=Lm>0?Lm-(J+U)*avg:null,Dp=num(r.pd);if(Dp>0)B=(B==null?0:B)-Dp;if(B!=null)ben+=B;
     var empty=!Object.keys(r).some(function(k){return r[k]!==""&&r[k]!=null});
     out.push({E:E,pra:num(r.pra),G:G,Lm:Lm,O:O,J:J,U:U,B:B,stock:Math.round((cE-cJ-cU)*10000)/10000,cap:num(open.cap)+cC-cD-cGr-cI+cO,empty:empty,pay:r.et=="Payé"});
   });
